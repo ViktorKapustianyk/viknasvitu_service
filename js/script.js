@@ -223,28 +223,12 @@ document.write('<meta name="viewport" content="width=device-width,initial-scale=
     }
 })(jQuery);
 
-/* Phone & Date Validation
+/* Date Picker - Future Dates Only
  ========================================================*/
 ;
 (function ($) {
     $(document).ready(function () {
-        // Простая проверка телефону: не менее 10 цифр
-        var phoneInput = $('input[name="Телефон"]');
-        if (phoneInput.length > 0) {
-            phoneInput.on('blur', function() {
-                var digits = $(this).val().replace(/\D/g, '');
-                
-                // Проверяємо, чи не менее 10 цифр
-                if ($(this).val() && digits.length < 10) {
-                    $(this).val('');
-                    $(this).attr('aria-invalid', 'true');
-                } else if ($(this).val()) {
-                    $(this).attr('aria-invalid', 'false');
-                }
-            });
-        }
-
-        // Запрет вибору дат з минулого в datepicker (жесткая блокировка)
+        // Запрет вибору дат з минулого в datepicker
         var dateInput = $('input[name="Дата заміру"]');
         if (dateInput.length > 0) {
             var today = new Date();

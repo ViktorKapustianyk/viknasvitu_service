@@ -63,8 +63,8 @@
                         <div class="cntr">
                             <div class="col">
                                 <div class="tmInput fl-chapps-pen55">
-                                    <input name="Телефон" placeHolder="Телефон (мін. 10 цифр)" type="text"
-                                           data-constraints='@NotEmpty(message="Вкажіть телефон") @Required(message="Вкажіть телефон")'>
+                                    <input name="Телефон" placeHolder="Телефон" type="text"
+                                           data-constraints='@NotEmpty(message="Вкажіть телефон") @Required(message="Вкажіть телефон") @JustNumbers(message="Вкажіть номер у цифровому форматі")'>
                                 </div>
                             </div>
                             <div class="col">
