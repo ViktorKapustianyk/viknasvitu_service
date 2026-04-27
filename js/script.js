@@ -228,58 +228,46 @@ document.write('<meta name="viewport" content="width=device-width,initial-scale=
 ;
 (function ($) {
     $(document).ready(function () {
-        // Форматирование номера телефону: +380 + 8 цифр
+        // Форматирование номера телефону: +380 + 10 цифр
+        // Формат: +380 XX XXX XXXX (де X - будь-які цифри, перший X після 380 може бути 0 або 9)
         var phoneInput = $('input[name="Телефон"]');
         if (phoneInput.length > 0) {
-            // При focus подставляємо +380 у порожне поле
-            phoneInput.on('focus', function() {
-                if ($(this).val() === '') {
-                    $(this).val('+38-0 ');
-                }
-            });
-
             phoneInput.on('input', function() {
-                var val = $(this).val();
-                var digits = val.replace(/\D/g, '');
+                var value = $(this).val().replace(/\D/g, '');
                 
-                // Якщо користувач видалив +380, повертаємо
-                if (!digits.startsWith('38')) {
-                    if (digits.length > 0) {
-                        $(this).val('+38-0' + digits.substring(0, 9));
-                    } else {
-                        $(this).val('+38-0 ');
-                    }
-                    return;
+                // Якщо користувач вводить 380 на початку, забираємо
+                if (value.startsWith('380')) {
+                    value = value.substring(3);
                 }
-                
-                // Забираємо 38 на початку
-                digits = digits.substring(2);
                 
                 // Обмежуємо до 10 цифр
-                digits = digits.substring(0, 10);
+                value = value.substring(0, 10);
                 
-                // Форматуємо: +38-0X XXX XXXX
-                if (digits.length === 0) {
-                    $(this).val('+38-0 ');
-                } else if (digits.length <= 2) {
-                    $(this).val('+38-0' + digits);
-                } else if (digits.length <= 5) {
-                    $(this).val('+38-0' + digits.substring(0, 2) + ' ' + digits.substring(2));
+                // Форматуємо: +380 XX XXX XXXX
+                if (value.length === 0) {
+                    $(this).val('');
+                } else if (value.length <= 2) {
+                    $(this).val('+380 ' + value);
+                } else if (value.length <= 5) {
+                    $(this).val('+380 ' + value.substring(0, 2) + ' ' + value.substring(2));
                 } else {
-                    $(this).val('+38-0' + digits.substring(0, 2) + ' ' + digits.substring(2, 5) + ' ' + digits.substring(5));
+                    $(this).val('+380 ' + value.substring(0, 2) + ' ' + value.substring(2, 5) + ' ' + value.substring(5));
                 }
             });
 
-            // При blur, перевіряємо, чи вводимо правильно 10 цифр
+            // При blur, перевіряємо, чи вводимо всі 10 цифр
             phoneInput.on('blur', function() {
                 var digits = $(this).val().replace(/\D/g, '');
-                if (digits.startsWith('38')) {
-                    digits = digits.substring(2);
+                
+                // Якщо користувач вводив 380, забираємо
+                if (digits.startsWith('380')) {
+                    digits = digits.substring(3);
                 }
                 
-                if ($(this).val().trim() !== '+38-0' && digits.length !== 10) {
+                // Проверяємо, чи ровно 10 цифр
+                if ($(this).val() && digits.length !== 10) {
                     $(this).val('');
-                } else if ($(this).val() === '+38-0' || $(this).val() === '') {
+                } else if (!$(this).val()) {
                     $(this).val('');
                 }
             });
