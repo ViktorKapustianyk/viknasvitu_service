@@ -223,6 +223,68 @@ document.write('<meta name="viewport" content="width=device-width,initial-scale=
     }
 })(jQuery);
 
+/* Phone Formatting & Date Restrictions
+ ========================================================*/
+;
+(function ($) {
+    $(document).ready(function () {
+        // Форматирование номера телефону: +380 + 8 цифр
+        var phoneInput = $('input[name="Телефон"]');
+        if (phoneInput.length > 0) {
+            phoneInput.on('input', function() {
+                var value = $(this).val().replace(/\D/g, '');
+                
+                // Якщо користувач вводить 38, то залишаємо її
+                // Інакше приймаємо перші 10 цифр (без 38)
+                if (value.startsWith('38')) {
+                    value = value.substring(2);
+                }
+                
+                // Обмежуємо до 10 цифр (38 + 10 = 12 цифр)
+                value = value.substring(0, 10);
+                
+                // Форматуємо: +380 XX XXX XXXX
+                if (value.length === 0) {
+                    $(this).val('');
+                } else if (value.length <= 2) {
+                    $(this).val('+38-' + value);
+                } else if (value.length <= 5) {
+                    $(this).val('+38-' + value.substring(0, 2) + ' ' + value.substring(2));
+                } else {
+                    $(this).val('+38-' + value.substring(0, 2) + ' ' + value.substring(2, 5) + ' ' + value.substring(5));
+                }
+            });
+
+            // При blur, якщо номер неповний, показуємо помилку
+            phoneInput.on('blur', function() {
+                var value = $(this).val().replace(/\D/g, '');
+                if (value.startsWith('38')) {
+                    value = value.substring(2);
+                }
+                
+                if ($(this).val() && value.length !== 10) {
+                    $(this).val('');
+                } else if (!$(this).val()) {
+                    $(this).val('');
+                }
+            });
+        }
+
+        // Запрет вибору дат з минулого в datepicker
+        var dateInput = $('input[name="Дата заміру"]');
+        if (dateInput.length > 0) {
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Очищаємо попередні налаштування datepicker
+            try { dateInput.datepicker('destroy'); } catch(e) {}
+            
+            dateInput.datepicker({
+                minDate: today
+            });
+        }
+    });
+})(jQuery);
 
 /* Booking Form
  ========================================================*/

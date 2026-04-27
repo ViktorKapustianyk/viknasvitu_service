@@ -58,13 +58,13 @@
                     <form id="bookingForm" class="booking-form">
                         <div class="tmInput fl-chapps-user139">
                             <input name="Імʼя" placeHolder="Ваше ім'я" type="text"
-                                   data-constraints='@NotEmpty(message="Вкажіть імʼя") @Required(message="Вкажіть імʼя") @AlphaSpecial(message="Імʼя має містити лише літери")'>
+                                   data-constraints='@NotEmpty(message="Вкажіть імʼя") @Required(message="Вкажіть імʼя")'>
                         </div>
                         <div class="cntr">
                             <div class="col">
                                 <div class="tmInput fl-chapps-pen55">
-                                    <input name="Телефон" placeHolder="Телефон" type="text"
-                                           data-constraints='@NotEmpty(message="Вкажіть телефон") @Required(message="Вкажіть телефон") @JustNumbers(message="Вкажіть номер у цифровому форматі")'>
+                                    <input name="Телефон" placeHolder="+380 XX XXX XXXX" type="text" maxlength="15"
+                                           data-constraints='@NotEmpty(message="Вкажіть телефон") @Required(message="Вкажіть телефон")'>
                                 </div>
                             </div>
                             <div class="col">

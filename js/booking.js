@@ -15,7 +15,7 @@ Varsion: 1.1
 			var $this = $(this),
 			data = $this.data('bookingForm'),
 			object = {
-				url: 'bat/booking.php', // php-script url
+			url: 'https://formspree.io/f/xeevwdle', // Formspree endpoint — замените xeevwdle на реальный ID из formspree.io
 				sender: '', // sender for header in e-mail
 				ownerEmail:'vityakap@gmail.com', // destination e-mail, message will be send on this e-mail
 				validate:true, // validate or not
