@@ -227,43 +227,30 @@ document.write('<meta name="viewport" content="width=device-width,initial-scale=
  ========================================================*/
 ;
 (function ($) {
-    function formatUaPhone(rawValue) {
-        var digits = String(rawValue || '').replace(/\D/g, '');
-        if (digits.indexOf('380') === 0) {
-            digits = digits.substring(3);
-        } else if (digits.indexOf('0') === 0) {
-            digits = digits.substring(1);
-        }
-
-        digits = digits.substring(0, 9);
-
-        var p0 = digits.substring(0, 2);
-        var p1 = digits.substring(2, 5);
-        var p2 = digits.substring(5, 7);
-        var p3 = digits.substring(7, 9);
-
-        return '+380 (' + (p0 + '__').substring(0, 2) + ') ' +
-            (p1 + '___').substring(0, 3) + '-' +
-            (p2 + '__').substring(0, 2) + '-' +
-            (p3 + '__').substring(0, 2);
-    }
-
     $(document).ready(function () {
-        var phoneInput = $('input[name="Телефон"]');
-        if (!phoneInput.length) return;
+        var phoneSelector = 'input[name="Телефон"]';
+        var phoneInput = document.querySelector(phoneSelector);
+        if (!phoneInput || typeof SimplePhoneMask === 'undefined') return;
 
-        phoneInput.on('focus', function () {
-            $(this).val(formatUaPhone($(this).val()));
+        new SimplePhoneMask(phoneSelector, {
+            countryCode: 'UA',
+            showFlag: false,
+            allowCountrySelect: false,
+            validate: false
         });
 
-        phoneInput.on('input paste', function () {
-            $(this).val(formatUaPhone($(this).val()));
+        phoneInput.addEventListener('focus', function () {
+            var digits = String(phoneInput.value || '').replace(/\D/g, '');
+            if (!digits) {
+                phoneInput.value = '+380';
+                phoneInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
         });
 
-        phoneInput.on('blur', function () {
-            var digits = $(this).val().replace(/\D/g, '');
-            if (digits === '380') {
-                $(this).val('');
+        phoneInput.addEventListener('blur', function () {
+            var digits = String(phoneInput.value || '').replace(/\D/g, '');
+            if (!digits || digits === '380') {
+                phoneInput.value = '';
             }
         });
     });
