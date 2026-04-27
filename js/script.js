@@ -237,24 +237,15 @@ document.write('<meta name="viewport" content="width=device-width,initial-scale=
 
         digits = digits.substring(0, 9);
 
-        var out = '+380';
-        if (digits.length > 0) {
-            out += ' (' + digits.substring(0, Math.min(2, digits.length));
-        }
-        if (digits.length >= 2) {
-            out += ')';
-        }
-        if (digits.length > 2) {
-            out += ' ' + digits.substring(2, Math.min(5, digits.length));
-        }
-        if (digits.length > 5) {
-            out += '-' + digits.substring(5, Math.min(7, digits.length));
-        }
-        if (digits.length > 7) {
-            out += '-' + digits.substring(7, Math.min(9, digits.length));
-        }
+        var p0 = digits.substring(0, 2);
+        var p1 = digits.substring(2, 5);
+        var p2 = digits.substring(5, 7);
+        var p3 = digits.substring(7, 9);
 
-        return out;
+        return '+380 (' + (p0 + '__').substring(0, 2) + ') ' +
+            (p1 + '___').substring(0, 3) + '-' +
+            (p2 + '__').substring(0, 2) + '-' +
+            (p3 + '__').substring(0, 2);
     }
 
     $(document).ready(function () {
@@ -262,9 +253,7 @@ document.write('<meta name="viewport" content="width=device-width,initial-scale=
         if (!phoneInput.length) return;
 
         phoneInput.on('focus', function () {
-            if (!$(this).val()) {
-                $(this).val('+380');
-            }
+            $(this).val(formatUaPhone($(this).val()));
         });
 
         phoneInput.on('input paste', function () {
