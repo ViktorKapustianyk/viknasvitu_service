@@ -292,11 +292,49 @@ Varsion: 1.1
 						}
 					});
 				},
+				normalizePhoneE164: function (value) {
+					var digits = String(value || '').replace(/\D/g, '');
+					if (digits.indexOf('380') === 0) {
+						return digits.substring(0, 12);
+					}
+					if (digits.indexOf('0') === 0 && digits.length >= 10) {
+						return ('38' + digits).substring(0, 12);
+					}
+					return digits;
+				},
+				validatePhoneField: function () {
+					var phoneField = null;
+					$.each(object.fields, function (ind, el) {
+						if (el.name === 'Телефон') {
+							phoneField = el;
+						}
+					});
+
+					if (!phoneField) return true;
+
+					var normalizedPhone = object.normalizePhoneE164(phoneField.value);
+					if (normalizedPhone.length === 12 && normalizedPhone.indexOf('380') === 0) {
+						phoneField.value = normalizedPhone;
+						phoneField.wrapper.removeClass(className(object.invalidClass)).find(object.errorMessageClass).remove();
+						return true;
+					}
+
+					if (!phoneField.wrapper.hasClass(className(object.invalidClass))) {
+						phoneField.wrapper
+							.addClass(className(object.invalidClass))
+							.append('<strong class="'+className(object.errorMessageClass)+'">Вкажіть номер у форматі +380 (__) ___-__-__</strong>')
+							.find(object.errorMessageClass).slideUp(0).slideDown();
+					}
+					return false;
+				},
 				// prepare data
 				prepareData: function () {
 					var data = {};
 					$.each(object.fields, function(ind, el){
 						var val = object.fields[ind].value;
+						if (object.fields[ind].name === 'Телефон') {
+							val = object.normalizePhoneE164(val);
+						}
 						if (val !== 'nope' && val !== '') {
 							data[object.fields[ind].name] = val;
 						}
@@ -339,7 +377,7 @@ Varsion: 1.1
 					$this.find('a[data-type="submit"]').click(function(){
 						object.readFieldsData();
 						object.validateData();
-						if (!$this.find(object.invalidClass).length) {
+						if (!$this.find(object.invalidClass).length && object.validatePhoneField()) {
 							object.submitData();	
 						}
 						return false;

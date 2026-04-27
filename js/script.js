@@ -223,6 +223,63 @@ document.write('<meta name="viewport" content="width=device-width,initial-scale=
     }
 })(jQuery);
 
+/* Phone Mask
+ ========================================================*/
+;
+(function ($) {
+    function formatUaPhone(rawValue) {
+        var digits = String(rawValue || '').replace(/\D/g, '');
+        if (digits.indexOf('380') === 0) {
+            digits = digits.substring(3);
+        } else if (digits.indexOf('0') === 0) {
+            digits = digits.substring(1);
+        }
+
+        digits = digits.substring(0, 9);
+
+        var out = '+380';
+        if (digits.length > 0) {
+            out += ' (' + digits.substring(0, Math.min(2, digits.length));
+        }
+        if (digits.length >= 2) {
+            out += ')';
+        }
+        if (digits.length > 2) {
+            out += ' ' + digits.substring(2, Math.min(5, digits.length));
+        }
+        if (digits.length > 5) {
+            out += '-' + digits.substring(5, Math.min(7, digits.length));
+        }
+        if (digits.length > 7) {
+            out += '-' + digits.substring(7, Math.min(9, digits.length));
+        }
+
+        return out;
+    }
+
+    $(document).ready(function () {
+        var phoneInput = $('input[name="Телефон"]');
+        if (!phoneInput.length) return;
+
+        phoneInput.on('focus', function () {
+            if (!$(this).val()) {
+                $(this).val('+380');
+            }
+        });
+
+        phoneInput.on('input paste', function () {
+            $(this).val(formatUaPhone($(this).val()));
+        });
+
+        phoneInput.on('blur', function () {
+            var digits = $(this).val().replace(/\D/g, '');
+            if (digits === '380') {
+                $(this).val('');
+            }
+        });
+    });
+})(jQuery);
+
 /* Date Picker - Future Dates Only
  ========================================================*/
 ;
