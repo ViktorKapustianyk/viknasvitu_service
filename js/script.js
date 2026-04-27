@@ -223,52 +223,23 @@ document.write('<meta name="viewport" content="width=device-width,initial-scale=
     }
 })(jQuery);
 
-/* Phone Formatting & Date Restrictions
+/* Phone & Date Validation
  ========================================================*/
 ;
 (function ($) {
     $(document).ready(function () {
-        // Форматирование номера телефону: +380 + 10 цифр
-        // Формат: +380 XX XXX XXXX (де X - будь-які цифри, перший X після 380 може бути 0 або 9)
+        // Простая проверка телефону: не менее 10 цифр
         var phoneInput = $('input[name="Телефон"]');
         if (phoneInput.length > 0) {
-            phoneInput.on('input', function() {
-                var value = $(this).val().replace(/\D/g, '');
-                
-                // Якщо користувач вводить 380 на початку, забираємо
-                if (value.startsWith('380')) {
-                    value = value.substring(3);
-                }
-                
-                // Обмежуємо до 10 цифр
-                value = value.substring(0, 10);
-                
-                // Форматуємо: +380 XX XXX XXXX
-                if (value.length === 0) {
-                    $(this).val('');
-                } else if (value.length <= 2) {
-                    $(this).val('+380 ' + value);
-                } else if (value.length <= 5) {
-                    $(this).val('+380 ' + value.substring(0, 2) + ' ' + value.substring(2));
-                } else {
-                    $(this).val('+380 ' + value.substring(0, 2) + ' ' + value.substring(2, 5) + ' ' + value.substring(5));
-                }
-            });
-
-            // При blur, перевіряємо, чи вводимо всі 10 цифр
             phoneInput.on('blur', function() {
                 var digits = $(this).val().replace(/\D/g, '');
                 
-                // Якщо користувач вводив 380, забираємо
-                if (digits.startsWith('380')) {
-                    digits = digits.substring(3);
-                }
-                
-                // Проверяємо, чи ровно 10 цифр
-                if ($(this).val() && digits.length !== 10) {
+                // Проверяємо, чи не менее 10 цифр
+                if ($(this).val() && digits.length < 10) {
                     $(this).val('');
-                } else if (!$(this).val()) {
-                    $(this).val('');
+                    $(this).attr('aria-invalid', 'true');
+                } else if ($(this).val()) {
+                    $(this).attr('aria-invalid', 'false');
                 }
             });
         }
