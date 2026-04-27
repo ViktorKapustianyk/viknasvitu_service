@@ -231,46 +231,61 @@ document.write('<meta name="viewport" content="width=device-width,initial-scale=
         // Форматирование номера телефону: +380 + 8 цифр
         var phoneInput = $('input[name="Телефон"]');
         if (phoneInput.length > 0) {
-            phoneInput.on('input', function() {
-                var value = $(this).val().replace(/\D/g, '');
-                
-                // Якщо користувач вводить 38, то залишаємо її
-                // Інакше приймаємо перші 10 цифр (без 38)
-                if (value.startsWith('38')) {
-                    value = value.substring(2);
-                }
-                
-                // Обмежуємо до 10 цифр (38 + 10 = 12 цифр)
-                value = value.substring(0, 10);
-                
-                // Форматуємо: +380 XX XXX XXXX
-                if (value.length === 0) {
-                    $(this).val('');
-                } else if (value.length <= 2) {
-                    $(this).val('+38-' + value);
-                } else if (value.length <= 5) {
-                    $(this).val('+38-' + value.substring(0, 2) + ' ' + value.substring(2));
-                } else {
-                    $(this).val('+38-' + value.substring(0, 2) + ' ' + value.substring(2, 5) + ' ' + value.substring(5));
+            // При focus подставляємо +380 у порожне поле
+            phoneInput.on('focus', function() {
+                if ($(this).val() === '') {
+                    $(this).val('+38-0 ');
                 }
             });
 
-            // При blur, якщо номер неповний, показуємо помилку
-            phoneInput.on('blur', function() {
-                var value = $(this).val().replace(/\D/g, '');
-                if (value.startsWith('38')) {
-                    value = value.substring(2);
+            phoneInput.on('input', function() {
+                var val = $(this).val();
+                var digits = val.replace(/\D/g, '');
+                
+                // Якщо користувач видалив +380, повертаємо
+                if (!digits.startsWith('38')) {
+                    if (digits.length > 0) {
+                        $(this).val('+38-0' + digits.substring(0, 9));
+                    } else {
+                        $(this).val('+38-0 ');
+                    }
+                    return;
                 }
                 
-                if ($(this).val() && value.length !== 10) {
+                // Забираємо 38 на початку
+                digits = digits.substring(2);
+                
+                // Обмежуємо до 10 цифр
+                digits = digits.substring(0, 10);
+                
+                // Форматуємо: +38-0X XXX XXXX
+                if (digits.length === 0) {
+                    $(this).val('+38-0 ');
+                } else if (digits.length <= 2) {
+                    $(this).val('+38-0' + digits);
+                } else if (digits.length <= 5) {
+                    $(this).val('+38-0' + digits.substring(0, 2) + ' ' + digits.substring(2));
+                } else {
+                    $(this).val('+38-0' + digits.substring(0, 2) + ' ' + digits.substring(2, 5) + ' ' + digits.substring(5));
+                }
+            });
+
+            // При blur, перевіряємо, чи вводимо правильно 10 цифр
+            phoneInput.on('blur', function() {
+                var digits = $(this).val().replace(/\D/g, '');
+                if (digits.startsWith('38')) {
+                    digits = digits.substring(2);
+                }
+                
+                if ($(this).val().trim() !== '+38-0' && digits.length !== 10) {
                     $(this).val('');
-                } else if (!$(this).val()) {
+                } else if ($(this).val() === '+38-0' || $(this).val() === '') {
                     $(this).val('');
                 }
             });
         }
 
-        // Запрет вибору дат з минулого в datepicker
+        // Запрет вибору дат з минулого в datepicker (жесткая блокировка)
         var dateInput = $('input[name="Дата заміру"]');
         if (dateInput.length > 0) {
             var today = new Date();
@@ -280,7 +295,32 @@ document.write('<meta name="viewport" content="width=device-width,initial-scale=
             try { dateInput.datepicker('destroy'); } catch(e) {}
             
             dateInput.datepicker({
-                minDate: today
+                minDate: today,
+                beforeShowDay: function(date) {
+                    var checkDate = new Date(date);
+                    checkDate.setHours(0, 0, 0, 0);
+                    
+                    // Забороняємо дату раніше ніж сьогодні
+                    if (checkDate < today) {
+                        return [false, '', 'Пройдена дата'];
+                    }
+                    return [true, ''];
+                }
+            });
+
+            // Додаткова перевірка при вводі вручну
+            dateInput.on('change', function() {
+                var inputDate = $(this).datepicker('getDate');
+                
+                if (inputDate) {
+                    var checkDate = new Date(inputDate);
+                    checkDate.setHours(0, 0, 0, 0);
+                    
+                    if (checkDate < today) {
+                        $(this).val('');
+                        alert('Можна вибрати тільки майбутню дату!');
+                    }
+                }
             });
         }
     });
