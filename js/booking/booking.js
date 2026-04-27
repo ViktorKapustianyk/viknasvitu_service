@@ -15,7 +15,7 @@ Varsion: 1.1
 			var $this = $(this),
 			data = $this.data('bookingForm'),
 			object = {
-				url: 'bat/booking.php', // php-script url
+				url: 'https://formspree.io/f/xeevwdle', // Formspree endpoint — замените xeevwdle на реальный ID из formspree.io
 				sender: '', // sender for header in e-mail
 				ownerEmail:'vityakap@gmail.com', // destination e-mail, message will be send on this e-mail
 				validate:true, // validate or not
@@ -294,30 +294,37 @@ Varsion: 1.1
 				},
 				// prepare data
 				prepareData: function () {
-					var data = {
-						owner_email: object.ownerEmail,
-						sender: (object.sender == '')?location.hostname:object.sender
-					}
-					$.each(object.fields, function(ind, el){		
-						var val = object.fields[ind].value; 
-						if (val == '') val = 'nope';
-						data[object.fields[ind].name] = val;
-					})
+					var data = {};
+					$.each(object.fields, function(ind, el){
+						var val = object.fields[ind].value;
+						if (val !== 'nope' && val !== '') {
+							data[object.fields[ind].name] = val;
+						}
+					});
 					return data;
 				},
 				// submit data
-				submitData: function(){	
+				submitData: function(){
 					$.ajax({
 						type: "POST",
 						url: object.url,
-						data: object.prepareData(),
-						success: function(results){
-							$this
-								.find(object.successMessageClass).remove().end()
-								.find('[data-type="submit"]').after('<p class="'+className(object.successMessageClass)+'">'+ object.successMessage +'</p>').end()
-								.find(object.successMessageClass).stop(true).slideUp(0).slideDown(object.writeFieldsDataDefaults).delay(4000).slideUp();
+						data: JSON.stringify(object.prepareData()),
+						contentType: 'application/json',
+						headers: { 'Accept': 'application/json' },
+						success: function(response){
+							if (response && response.ok) {
+								$this
+									.find(object.successMessageClass).remove().end()
+									.find('[data-type="submit"]').after('<p class="'+className(object.successMessageClass)+'">'+ object.successMessage +'</p>').end()
+									.find(object.successMessageClass).stop(true).slideUp(0).slideDown(object.writeFieldsDataDefaults).delay(4000).slideUp();
+							} else {
+								console.warn('Formspree error:', response);
+							}
+						},
+						error: function(xhr) {
+							console.error('Form submit error:', xhr.responseText);
 						}
-					})
+					});
 				},
 				// addListebers to controls
 				addListeners: function () {

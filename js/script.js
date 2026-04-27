@@ -237,7 +237,8 @@ document.write('<meta name="viewport" content="width=device-width,initial-scale=
         include('js/booking/regula.js');
         $(document).ready(function () {
             o.bookingForm({
-                ownerEmail: 'vityakap@gmail.com',
+                // Formspree endpoint: после регистрации на formspree.io замените xeevwdle
+                url: 'https://formspree.io/f/xeevwdle',
                 successMessage: "Дякуємо! Заявку відправлено. Ми зв'яжемося з вами найближчим часом."
             });
         });
