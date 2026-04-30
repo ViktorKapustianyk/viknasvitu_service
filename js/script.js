@@ -19,8 +19,37 @@ document.addEventListener( 'DOMContentLoaded', function() {
 	try { $('body').unmousewheel(); } catch( error ) {}
 });
 
+var scriptBasePath = (function () {
+    var currentScript = document.currentScript;
+    var fallbackPattern = /(?:^|\/)js\/script\.js(?:[?#].*)?$/;
+
+    if (currentScript && currentScript.src) {
+        return currentScript.src.replace(/[^/?#]+(?:[?#].*)?$/, '');
+    }
+
+    var scripts = document.getElementsByTagName('script');
+    for (var i = scripts.length - 1; i >= 0; i--) {
+        var src = scripts[i].getAttribute('src') || '';
+        if (fallbackPattern.test(src)) {
+            return src.replace(/[^/?#]+(?:[?#].*)?$/, '');
+        }
+    }
+
+    return 'js/';
+})();
+
 function include(scriptUrl) {
-    document.write('<script src="' + scriptUrl + '"></script>');
+    var resolvedUrl = scriptUrl;
+
+    if (!/^(?:[a-z]+:)?\/\//i.test(scriptUrl) && scriptUrl.indexOf('/') !== 0) {
+        if (scriptUrl.indexOf('js/') === 0) {
+            resolvedUrl = scriptBasePath + scriptUrl.substring(3);
+        } else {
+            resolvedUrl = scriptBasePath + scriptUrl;
+        }
+    }
+
+    document.write('<script src="' + resolvedUrl + '"></script>');
 }
 
 function isIE() {
@@ -261,8 +290,10 @@ document.write('<meta name="viewport" content="width=device-width,initial-scale=
 ;
 (function ($) {
     $(document).ready(function () {
+        var pageLang = (document.documentElement.getAttribute('lang') || 'uk').toLowerCase();
+        var isRussian = pageLang === 'ru';
         // Запрет вибору дат з минулого в datepicker
-        var dateInput = $('input[name="Дата заміру"]');
+        var dateInput = $('input[name="Дата заміру"], input[name="Дата замера"]');
         if (dateInput.length > 0) {
             var today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -278,7 +309,7 @@ document.write('<meta name="viewport" content="width=device-width,initial-scale=
                     
                     // Забороняємо дату раніше ніж сьогодні
                     if (checkDate < today) {
-                        return [false, '', 'Пройдена дата'];
+                        return [false, '', isRussian ? 'Прошедшая дата' : 'Пройдена дата'];
                     }
                     return [true, ''];
                 }
@@ -294,7 +325,7 @@ document.write('<meta name="viewport" content="width=device-width,initial-scale=
                     
                     if (checkDate < today) {
                         $(this).val('');
-                        alert('Можна вибрати тільки майбутню дату!');
+                        alert(isRussian ? 'Можно выбрать только будущую дату!' : 'Можна вибрати тільки майбутню дату!');
                     }
                 }
             });
@@ -314,10 +345,13 @@ document.write('<meta name="viewport" content="width=device-width,initial-scale=
         include('js/booking/jquery.placeholder.js');
         include('js/booking/regula.js');
         $(document).ready(function () {
+            var pageLang = (document.documentElement.getAttribute('lang') || 'uk').toLowerCase();
             o.bookingForm({
                 // Formspree endpoint: после регистрации на formspree.io замените xeevwdle
                 url: 'https://formspree.io/f/xeevwdle',
-                successMessage: "Дякуємо! Заявку відправлено. Ми зв'яжемося з вами найближчим часом."
+                successMessage: pageLang === 'ru'
+                    ? 'Спасибо! Заявка отправлена. Мы свяжемся с вами в ближайшее время.'
+                    : "Дякуємо! Заявку відправлено. Ми зв'яжемося з вами найближчим часом."
             });
         });
     }

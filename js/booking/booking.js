@@ -304,6 +304,7 @@ Varsion: 1.1
 				},
 				validatePhoneField: function () {
 					var phoneField = null;
+					var pageLang = (document.documentElement.getAttribute('lang') || 'uk').toLowerCase();
 					$.each(object.fields, function (ind, el) {
 						if (el.name === 'Телефон') {
 							phoneField = el;
@@ -322,7 +323,7 @@ Varsion: 1.1
 					if (!phoneField.wrapper.hasClass(className(object.invalidClass))) {
 						phoneField.wrapper
 							.addClass(className(object.invalidClass))
-							.append('<strong class="'+className(object.errorMessageClass)+'">Вкажіть номер у форматі +380 (__) ___-__-__</strong>')
+							.append('<strong class="'+className(object.errorMessageClass)+'">' + (pageLang === 'ru' ? 'Укажите номер в формате +380 (__) ___-__-__' : 'Вкажіть номер у форматі +380 (__) ___-__-__') + '</strong>')
 							.find(object.errorMessageClass).slideUp(0).slideDown();
 					}
 					return false;
