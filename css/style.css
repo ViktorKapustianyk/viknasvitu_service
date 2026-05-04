@@ -351,7 +351,9 @@ p + p {
 }
 @media (max-width: 767px) {
   .bg-img:before {
-    width: 0;
+    width: 100%;
+    background-position: center bottom;
+    opacity: 0.28;
   }
 }
 .bg-img * {
